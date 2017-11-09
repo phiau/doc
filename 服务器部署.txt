@@ -7,7 +7,12 @@
     Ubuntu 安装命令 ：apt-get update; apt-get install ***
     访问某个端口正不正常： nc -nvz 地址 端口
 
-2.  需要安装的辅助工具：make，lrzsz
+2.  确认服务器时区时间
+    首先执行： tzselect
+    然后：     sudo cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+
+3.  需要安装的辅助工具：make，lrzsz
     需要安装的运行工具：java，redis, mysql
 
     make： apt-get update; apt-get install build-essential;
@@ -30,13 +35,13 @@
     mysql:
         执行指令：sudo apt-get install mysql-server；  注意查看版本是否符合需求
 
-3.  mysql 数据库可能遇到的问题：
+4.  mysql 数据库可能遇到的问题：
     
-    3.1 如果需要在本地意外的地方访问数据，需要确保 /etc/mysql/mysql.conf.d/mysqld.cnf 的 bind-address 值不是 127.0.0.1。如果是需要修改为 0.0.0.0 或者其他地址，然后执行：/etc/init.d/mysql restart；重启服务器
+    4.1 如果需要在本地意外的地方访问数据，需要确保 /etc/mysql/mysql.conf.d/mysqld.cnf 的 bind-address 值不是 127.0.0.1。如果是需要修改为 0.0.0.0 或者其他地址，然后执行：/etc/init.d/mysql restart；重启服务器
 
-    3.2 mysql.user 表的 'Host' 字段，标识了对应用户可以从什么地址访问数据库服务器，'%' 为任意地址
+    4.2 mysql.user 表的 'Host' 字段，标识了对应用户可以从什么地址访问数据库服务器，'%' 为任意地址
 
-    3.3 增加用户和权限，参考官网：https://dev.mysql.com/doc/refman/5.7/en/adding-users.html
+    4.3 增加用户和权限，参考官网：https://dev.mysql.com/doc/refman/5.7/en/adding-users.html
 
         例如：
         CREATE USER 'finley'@'localhost' IDENTIFIED BY 'password';
@@ -47,15 +52,23 @@
 
         FLUSH PRIVILEGES
 
-4.  游戏服务器：
+    4.4 数据库的默认字符需要确认一遍，可以在 /etc/mysql/mysql.conf.d/mysqld.cnf 后面加入，这样以后新建表的字符集也是这个
+        [mysql]
+        default-character-set=utf8mb4
+        [mysqld]
+        character-set-server=utf8mb4
 
-    4.1 基本目录结构
+        然后重启一下数据库服务器，如果是以前建的表，需要把对应的字段的字符集改成新的；
+
+5.  游戏服务器：
+
+    5.1 基本目录结构
 
         游戏服务器目录：/lzddz
         热更新目录：/hotupdate 下面要有 hot  iosHot  iosUapk  uapk 这么几个目录，这个最好控制在程序里面
 
 
-    4.2 基本配置，常见需要修改的：
+    5.2 基本配置，常见需要修改的：
 
         run.sh : JAVA_HOME 
 
@@ -66,3 +79,8 @@
         config/ResConfig.json ：服务器地址
 
         config/DataBaseConfig.json : 数据库配置
+
+
+
+
+        http://blog.csdn.net/yeyuangen/article/details/52103445
