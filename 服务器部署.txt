@@ -1,0 +1,68 @@
+
+
+部署新服务器：
+
+1.  指令介绍：
+    查看工具位置    ：which ***
+    Ubuntu 安装命令 ：apt-get update; apt-get install ***
+    访问某个端口正不正常： nc -nvz 地址 端口
+
+2.  需要安装的辅助工具：make，lrzsz
+    需要安装的运行工具：java，redis, mysql
+
+    make： apt-get update; apt-get install build-essential;
+    lrzsz: apt-get install lrzsz
+
+    java: 
+        首先：把 jdk-8u131-linux-x64.tar.gz 解压出来 jdk1.8.0_131，然后放到 /usr/local/java 目录下（其他目录也可以）；
+        然后：编辑 /etc/profile 文件，在最后加入
+               export JAVA_HOME=/usr/local/java/jdk1.8.0_131
+               export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+               export PATH=$PATH:$JAVA_HOME/bin
+               export JAVA_HOME CLASSPATH PATH
+              保存退出，然后执行：source /etc/profile
+
+    redis：
+        首先：压缩包 redis-3.2.0.tar.gz，解压：tar xf redis-3.2.0.tar.gz
+        然后：进入目录执行：make
+        最后：执行 make install
+
+    mysql:
+        执行指令：sudo apt-get install mysql-server；  注意查看版本是否符合需求
+
+3.  mysql 数据库可能遇到的问题：
+    
+    3.1 如果需要在本地意外的地方访问数据，需要确保 /etc/mysql/mysql.conf.d/mysqld.cnf 的 bind-address 值不是 127.0.0.1。如果是需要修改为 0.0.0.0 或者其他地址，然后执行：/etc/init.d/mysql restart；重启服务器
+
+    3.2 mysql.user 表的 'Host' 字段，标识了对应用户可以从什么地址访问数据库服务器，'%' 为任意地址
+
+    3.3 增加用户和权限，参考官网：https://dev.mysql.com/doc/refman/5.7/en/adding-users.html
+
+        例如：
+        CREATE USER 'finley'@'localhost' IDENTIFIED BY 'password';
+        GRANT ALL PRIVILEGES ON *.* TO 'finley'@'localhost' WITH GRANT OPTION;
+
+        CREATE USER 'finley'@'%' IDENTIFIED BY 'password';
+        GRANT ALL PRIVILEGES ON *.* TO 'finley'@'%' WITH GRANT OPTION;
+
+        FLUSH PRIVILEGES
+
+4.  游戏服务器：
+
+    4.1 基本目录结构
+
+        游戏服务器目录：/lzddz
+        热更新目录：/hotupdate 下面要有 hot  iosHot  iosUapk  uapk 这么几个目录，这个最好控制在程序里面
+
+
+    4.2 基本配置，常见需要修改的：
+
+        run.sh : JAVA_HOME 
+
+        serverConsoles.sh ：REDIS_SERVER_PATH、REDIS_CONFIG_PATH、psw
+
+        game.properties ：服务器地址 server_url、roomInfoId、微信登录秘钥 等
+
+        config/ResConfig.json ：服务器地址
+
+        config/DataBaseConfig.json : 数据库配置
