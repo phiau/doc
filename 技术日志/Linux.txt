@@ -1,0 +1,14 @@
+
+2017-11-08(Wednesday) 16:10
+    今天同事跟我说用 sz 下载一个文件，超过 100% 了还在继续下载。我也试了下，发现 SecureCRT 提示文件超过 4G。但是我用 du -h 显示才一百多 M，不过用 ls -lh 显示确实超过了 4G。后来上网查了资料，才知道这个是一个稀疏文件。
+
+    那为什么之前没有这个问题，现在有了。之前我们的日志都是定时用 reredirect 这个工具重定向输出到另外的文件，后来发现这个工具有时会有问题，就用了备份，然后 "cat /dev/null > 文件" 这个方式来替代，然后就了这个问题。
+
+    而用 sz ，估计也是跟 scp 一样，scp 不支持稀疏文件的处理，所以就会提示超过 4G，后来参考了这个搞定了问题：http://int32bit.me/2016/06/01/Sparse%E6%96%87%E4%BB%B6%E5%A4%84%E7%90%86%E5%92%8C%E4%BC%A0%E8%BE%93/。
+
+    可能的与原理是这样：cat /dev/null > 文件，只是把当前文件给置空了，但是原来的写入还是在继续的写入，它的文件写入位置不变，所以就造成了前面的大小还是不变，只是变为空了而已。
+    参考：https://unix.stackexchange.com/questions/147044/cat-dev-null-emptied-my-log-file-but-size-did-not-change
+    原文：
+    the answer is that the process that has the file open for writing did so without O_APPEND, or it sets the offset into the file arbitrarily, in which case a sparse file is created. This is a file that contains "holes", i.e. the system "knows" that there are large regions with zeroes, which are not really written to disk. This is why du and ls disagree - du looks at the actual disk usage, while ls uses simply stat() to extract the file size attribute.
+
+    Remedy: restart the process. If possible, rewrite the part where the file is opened to use O_APPEND (or mode a when using fopen())
