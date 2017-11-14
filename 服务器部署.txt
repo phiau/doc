@@ -8,8 +8,7 @@
     访问某个端口正不正常： nc -nvz 地址 端口
 
 2.  确认服务器时区时间
-    首先执行： tzselect
-    然后：     sudo cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+    sudo timedatectl set-timezone Asia/Shanghai
 
 
 3.  需要安装的辅助工具：make，lrzsz
