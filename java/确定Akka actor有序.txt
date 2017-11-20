@@ -1,0 +1,133 @@
+
+
+  之前看过云风的 skynet 源码，才开始了解 actor 模型。它就是有一个自己的消息队列机制，然后每一个 actor 都有一个消息队列，所以在多线程环境下，每一个 actor 收消息是有序的。
+
+  在足球框架中使用 Akka actor 模型，为了确定它处理消息的时候，是在同一个线程，而且是有序的，所以还是测试了一下。毕竟这些基础的东西，在后期改起来风险有点大，今晚测了一下，确实是同一个线程，有序。
+
+// PhiauActor.java
+import akka.actor.AbstractActor;
+import akka.actor.Props;
+
+public class PhiauActor extends AbstractActor {
+
+    public static Props props(int total) { return Props.create(PhiauActor.class, total); }
+
+    private int total = 0;
+    private int ticketNum = 0;
+
+    public PhiauActor(int total) { this.total = total; }
+
+    public void doIt(int num) {
+        if(total != ticketNum){
+            System.out.println("售出了第"+(ticketNum + 1)+"张票");
+            ticketNum += 1;
+
+            if (3 == ticketNum) {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            for (int i=0; i<ticketNum; i++) {
+                System.out.print(i + ", ");
+            }
+            System.out.println("");
+        }else{
+            System.out.println("卖完了.....");
+        }
+    }
+
+    @Override
+    public Receive createReceive() {
+        return receiveBuilder()
+                .match(Integer.class, num -> doIt(num))
+                .build();
+    }
+}
+
+// PhiauNotActor.java
+public class PhiauNotActor {
+
+    private int total = 0;
+    private int ticketNum = 0;
+
+    public PhiauNotActor(int total) { this.total = total; }
+
+    public void doIt(int num) {
+        if(total != ticketNum){
+            System.out.println("售出了第"+(ticketNum + 1)+"张票");
+            ticketNum += 1;
+
+            if (3 == ticketNum) {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            for (int i=0; i<ticketNum; i++) {
+                System.out.print(i + ", ");
+            }
+            System.out.println("");
+        }else{
+            System.out.println("卖完了.....");
+        }
+    }
+}
+
+// TestMain.java
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+
+public class TestMain {
+
+    int num = 10;
+    ActorSystem actorSystem = ActorSystem.create();
+    ActorRef ref = actorSystem.actorOf(PhiauActor.props(num));
+
+    public static void main(String[] argv) {
+        TestMain testMain = new TestMain();
+        PhiauNotActor notActor = new PhiauNotActor(testMain.num);
+
+        for (int i=0; i<testMain.num; i++) {
+            int finalI = i;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+//                    testMain.ref.tell(finalI, ActorRef.noSender());
+                    notActor.doIt(finalI);
+                }
+            }).start();
+        }
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+结果：
+售出了第1张票
+0, 
+售出了第2张票
+0, 1, 
+售出了第3张票
+0, 1, 2, 
+售出了第4张票
+0, 1, 2, 3, 
+售出了第5张票
+0, 1, 2, 3, 4, 
+售出了第6张票
+0, 1, 2, 3, 4, 5, 
+售出了第7张票
+0, 1, 2, 3, 4, 5, 6, 
+售出了第8张票
+0, 1, 2, 3, 4, 5, 6, 7, 
+售出了第9张票
+0, 1, 2, 3, 4, 5, 6, 7, 8, 
+售出了第10张票
+0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
+
+
