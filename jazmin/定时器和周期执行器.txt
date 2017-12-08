@@ -1,0 +1,52 @@
+
+2017-12-01(Friday)
+
+1. 类 ScheduledExecutorService 介绍
+
+    1.1 方法：
+            public ScheduledFuture<?> scheduleAtFixedRate(Runnable command,  
+                    long initialDelay,  
+                    long period,  
+                    TimeUnit unit);   
+        描述：
+            以固定的时间间隔执行调用某个线程，可以设置延迟多少开始。
+            所以，只要是固定的时间间隔就可以调用该方法。例如每一天的某一个时刻执行，那么算出第一次的延迟，间隔的话，就是一天的时间，就可以了。
+
+    1.2 方法：
+            public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,  
+                    long initialDelay,  
+                    long delay,  
+                    TimeUnit unit);
+        描述：
+            这个和上面的唯一的区别在于，上面的间隔是固定的，不管你线程需要执行多久。而这个是在线程执行结束后，隔固定的时间，再执行线程。（间隔为：前一次执行结束到下次执行开始的时间间隔）
+
+
+
+2. jazmin 定时器 Task
+
+    2.1 注解 
+        TaskDefine {
+            long initialDelay();
+            long period();
+            TimeUnit unit();
+            boolean runInThreadPool() default true;
+        }
+
+
+    2.2 就是对 scheduledExecutorService.scheduleAtFixedRate 进行了封装；
+
+    2.3 用一个 Map 存储，所以，重新加载配置不会出多同个方法，多个内存实例；
+
+
+3. jazmin 周期性执行任务 Job
+
+    3.1 注解
+        JobDefine {
+            String cron();
+        }
+
+    3.2 
+        它是执行了一个 “事件间隔” 为 30 秒的定时器，然后计算出下次执行的时间，然后来判断。
+
+    3.3 用一个 Map 存储，所以，重新加载配置不会出多同个方法，多个内存实例；
+

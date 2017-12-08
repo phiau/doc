@@ -30,9 +30,12 @@
         首先：压缩包 redis-3.2.0.tar.gz，解压：tar xf redis-3.2.0.tar.gz
         然后：进入目录执行：make
         最后：执行 make install
+        备注：如果是 centos 缺少 gcc，那么可以 yum install gcc-c++ libstdc++-devel 安装
 
     mysql:
         执行指令：sudo apt-get install mysql-server；  注意查看版本是否符合需求
+
+        如果是 centos 版本，可以参考：https://www.cnblogs.com/lzj0218/p/5724446.html
 
 4.  mysql 数据库可能遇到的问题：
     
@@ -50,6 +53,8 @@
         GRANT ALL PRIVILEGES ON *.* TO 'finley'@'%' WITH GRANT OPTION;
 
         FLUSH PRIVILEGES
+
+        备注：如果密码不符合规则 “ERROR 1819 (HY000): Your password does not satisfy the current policy requirements”，可以执行指令：set global validate_password_policy=0;
 
     4.4 数据库的默认字符需要确认一遍，可以在 /etc/mysql/mysql.conf.d/mysqld.cnf 后面加入，这样以后新建表的字符集也是这个
         [mysql]
