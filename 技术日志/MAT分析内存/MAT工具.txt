@@ -21,3 +21,11 @@
 jps
 jmap -histo:live $threadId(进程id)
 jmap -dump:live,format=b,file=heap.dump $threadId(进程id)
+
+
+
+2017-12-14(Thursday)
+
+今天再次使用 mat 来分析内存，这次有可能找到祸首之一了，中间经过了许多波折。下面把波折省略掉
+
+在 Histogram 中筛选 “com.dszy.game.service.match” ，结果发现了 com.dszy.game.service.match.RestrictManager 这个的 Retained Heap >= 110538600，九位数了
