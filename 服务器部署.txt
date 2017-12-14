@@ -34,6 +34,7 @@
 
     mysql:
         执行指令：sudo apt-get install mysql-server；  注意查看版本是否符合需求
+        卸载：sudo apt-get remove --purge mysql-\*
 
         如果是 centos 版本，可以参考：https://www.cnblogs.com/lzj0218/p/5724446.html
 
