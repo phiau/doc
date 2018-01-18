@@ -1,0 +1,81 @@
+
+
+今天在做排行榜，用到了 TreeSet，元素只有两个属性（userId，point），直接上代码
+
+
+    public static class CupMatchRankItem implements Comparable {
+        private long userId;
+        private int point;
+
+        public CupMatchRankItem(long userId) {
+            this.userId = userId;
+        }
+
+        public CupMatchRankItem(long userId, int point) {
+            this.userId = userId;
+            this.point = point;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return 0 == this.userId - ((CupMatchRankItem)obj).userId;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            CupMatchRankItem obj = (CupMatchRankItem) o;
+            if (obj.userId == this.userId) return 0;
+            if (obj.point != this.point) return obj.point - this.point;
+            return (int) (obj.userId - this.userId);
+        }
+    }
+
+    private TreeSet<CupMatchRankItem> cupMatchTS = new TreeSet<>();
+
+    /**
+     *  获得玩家在杯赛的排名
+     * @param userId
+     * @return
+     */
+    private int getRank(long userId) {
+        CupMatchRankItem tmp = new CupMatchRankItem(userId);       // 最主要是这里的问题
+        if (cupMatchTS.contains(tmp)) {
+            return cupMatchTS.headSet(tmp).size() + 1;
+        }
+        return -1;
+    }
+
+    /**
+     *  更新玩家在杯赛排名系统的数据
+     * @param userId
+     * @param point
+     */
+    private void updateCupMatchPoint(long userId, int point) {
+        CupMatchRankItem item = new CupMatchRankItem(userId, point);
+        if (cupMatchTS.contains(item)) {
+            cupMatchTS.remove(item);
+        }
+        cupMatchTS.add(item);
+    }
+
+    // =================================================================
+
+
+    测试代码：
+
+    for (int i=10; i>0; i--) {
+        rankSystem.updateCupMatchPoint(i, i);
+    }
+
+    for (int i=1; i<11; i++) {
+        System.out.print(rankSystem.getRank(i) + " ");
+    }
+
+    // 运行结果：10 9 8 -1 6 -1 4 -1 -1 -1 
+
+    也就是有些排名正常，有些获取不正常。后来才知道原因，在 getRank 的时候，只用了 userId 来查找，虽然 userId 只要相等就可以不用理会 point 了。但是 “树” 在查找的时候，必须根据 “值” 来选择 “往左往右”。这里没有给 point 赋值，所以默认的值就是 0。
+
+    有些正常，那是因为刚好 “往左往右” 的方向对了。
+
+
+

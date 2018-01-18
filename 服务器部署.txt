@@ -6,6 +6,8 @@
     查看工具位置    ：which ***
     Ubuntu 安装命令 ：apt-get update; apt-get install ***
     访问某个端口正不正常： nc -nvz 地址 端口
+    增加用户：useradd -m -g root -d /home/** -m -s /bin/bash
+    添加sudo：sudo adduser <username> sudo
 
 2.  确认服务器时区时间
     sudo timedatectl set-timezone Asia/Shanghai
