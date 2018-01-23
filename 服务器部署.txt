@@ -91,3 +91,10 @@
 
 
         http://blog.csdn.net/yeyuangen/article/details/52103445
+
+
+6.  更新 96 服务器数据库
+
+    mysqldump -uroot -p --default-character-set=utf8 -c -t baggio_zone_data > baggio_zone_data.sql
+
+    mysql -uroot -p baggio_zone_data < baggio_zone_data.sql
