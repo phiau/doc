@@ -1,0 +1,25 @@
+
+
+2018-01-26(Friday)
+
+
+    类加载器
+
+    今天发现了一个问题，在部署服务器的时候，发现如果是动态加载 jar 包（把模块逻辑打包成 jar包）通过 org.reflections.Reflections.getTypesAnnotatedWith 会得不到类集合。而通过添加到 classpath 的方式，则可以。
+
+    后来通过找资料，对象在 jvm 的标识是 “类加载器 + 类全路径”。而这边加载 jar 包的时候，是通过 java.net.URLClassLoader 来加载的，而默认的是 sun.misc.Launcher.ClassLoader。
+
+
+    /** 正常，不会提示找不到类 **/
+    public static void testURLClassLoader(String jarFile, String cls) throws ClassNotFoundException, MalformedURLException {
+        URLClassLoader loader = new URLClassLoader(new URL[]{new File(jarFile).toURI().toURL()});
+        Class o = Class.forName(cls, false, loader);     // Class.forName(cls); 则提示找不到类 : java.lang.ClassNotFoundException: com.yangqugame.gm.GMManager
+        System.out.println(o.getClassLoader());
+    }
+
+    public static void main(String[] args) {
+        String jarFile = "F://BaggioMessageApplication.jar";
+        String cls = "com.yangqugame.gm.GMManager";
+
+        testURLClassLoader(jarFile, cls);
+    }
