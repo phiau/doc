@@ -1,0 +1,73 @@
+
+
+2018-03-01(Thursday)
+
+    《netty实战》笔记：
+
+    第一章 Netty -- 异步与事件驱动
+
+       1. netty 是不是一个连接对应一个线程：不是，它相当于是用了多路复用的 api，然后用线程池来回调上层逻辑，不然不可能支撑成千上万的链接；
+
+       2. channel 相当于 linux 的文件描述符（网络设备、文件、网络套接字），可以对其读写操作；
+
+       3. ChannelHandler 是 channel 的逻辑处理；（许多开箱即用的 ChannelHandler 实现）
+
+       4. ChannelFuture 和 ChannelFutureListener；
+
+       异步编程模型建立在 Future 和回调的概念之上；事件则是建立在多路复用之上；
+
+
+    第二章 你的第一款 Netty 应用程序
+
+    第三章 Netty 的组件和设计
+
+        1. ChannelPipeline 可以看做是一条管道，管道包含了一组 ChannelHandler，数据（输入或者输出）经过从管道的第一个（不同方向）ChannelHandler （加工/消耗）进入第二个……；
+
+        2. ServerBootstrap 相对于客户端的 Bootstrap 需要两个 EventLoopGroup，一个用监听端口的套接字，一个用于已建立链接的 Channel；
+
+    第四章 传输
+
+        1. 零拷贝：是一种目前只有在使用 NIO 和 Epoll 传输时才使用的特性。它是你可以快速高效的将数据从文件系统移动到网络接口，而不需要从内核空间复制到用户空间。
+
+        2. 使用 epoll 替代 JDK 的 NIO，将 NioEventLoopGroup 替换为 EpollEventLoopGroup，相应的 NioServerSocketChannel 替换为 EpollServerSocketChannel；
+
+    第五章 ByteBuf
+
+        1. read、write 开头的 ByteBuf 方法，会推进对应的索引，而以 set 或者 get 开头的操作则不会；
+
+        2. 堆缓冲区和直接缓冲区；
+
+        3. 使用需要一个索引值的方法（如：ByteBuf.getByte(i)）来访问数据，既不会改变 readrIndex 也不会改变 writerIndex。如果需要，可以通过 readerIndex(index) 或者 writeIndex(index) 来手动移动这两者；
+
+        4. 可丢弃字节，前面那些已经被读过的字节，可以通过 discardReadBytes() 方法，将 “可读+可写” 的 index 向前移动，当然这个时候，会发生内存复制；
+
+        5. 索引管理，标记和重置索引的方法；
+
+        ByteBufHolder 接口、ByteBuf 分配、引用计数 没看；
+
+    第六章 ChannelHandler 和 ChannelPipeline
+
+        1. ChannelPipeline 中的 ChannelHandler 通过 ChannelHandlerContext 来获知下一个 ChannelHandler；
+
+    第七章 EventLoop 和线程模型
+
+        1. 推荐了一本 《Java 并发编程实战》；
+
+        2. 虽然池化和重用线程相对于简单地为每个任务都创建和销毁线程是一种进步，但是它不能消除上下文切换带来的开销；以此引入了 EventLoop 接口；
+
+        3. EventLoopGroup 有多个 EventLoop，每个 EventLoop 分配给一个或者多个 channel（非阻塞 io 的情况下）；
+
+        这一章需要在后面多看一遍；
+
+    第八章 引导
+
+        1. 不能混用不同前缀的组件，如 NioEventLoopGroup 和 OioSocketChannel；
+
+        2. 使用 ChannelInitializer 来处理多个 ChannelHandler 的安装；
+
+    第九章 单元测试
+
+        
+
+
+
