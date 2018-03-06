@@ -1,0 +1,37 @@
+
+
+1. decorator 装饰模式
+
+   优点：可以在运行时刻增加和删除功能，可以混合多个功能；同样的功能也可以用继承来实现，这样会产生许多新的类，增加复杂度（例如：一道菜要加调料，可以添加 n 种调料，如果是继承，那么设计起来会很繁琐，增加的新的类要远大于 n，还不灵活，这种场景只需要有 n 个装饰类就可以了）；
+
+   缺点： 有许多小对象（在适当的场景，这不能说是缺点）；
+
+   实现：
+        接口的一致性
+
+
+2. adapter 适配模式
+   
+   使用场景：有一个已经存在的类 Adaptee 可以实现某些接口 target 需要的功能，可是 target 的接口名（规范）跟 Adaptee 不一样，而你又不能对其进行修改，然后就再其基础上进行封装。
+
+   实现：建一个新类实现 target 的接口，然后在接口实现中调用 Adaptee 的方法。（其实我们在写代码的时候，有这么封装过，只不过我们没有像大神一样，在更高的维度看问题）
+
+   应用：
+        适配 InputStream 接口：
+            ByteArrayInputStream ：为一个 byte 数组适配；
+            StringBufferInputStream ： 为一个 String 对象适配；
+            FileInputStream ：为一个文件适配；
+            ………
+
+        适配 OutputStream 接口：
+            ByteArrayOutputStream ：为一个 byte 数组适配；
+            FileOutputStream ：为一个文件适配；
+            ………
+
+        适配 Reader 接口；
+            StringReader ：
+
+        适配 Writer 接口；
+            StringWriter ：
+
+        当你的一组应用程序（API）只允许用（InputStream、OutputStream、Reader、Writer)，但是你又想用已有的 String、File 等，那这个时候，就可以用这些适配。
